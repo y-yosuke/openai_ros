@@ -1,5 +1,0 @@
-# GptService.srv
-string prompt
-string input
----
-string output
