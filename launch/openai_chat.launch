@@ -2,10 +2,20 @@
   
   <arg name="key" default="$(env OPENAI_API_KEY)" />
   <arg name="model" default="gpt-3.5-turbo" />
-
-  <node pkg="openai_ros" type="openai_chat_server.py" name="openai_chat" output="screen">
+  <arg name="service" default="false" />
+  <arg name="prompt" default="You are a helpful assistant." />
+  
+  <node if="$(arg service)"
+        pkg="openai_ros" type="openai_chat_server.py" name="openai_chat_service" output="screen">
     <param name="key" value="$(arg key)" />
     <param name="model" value="$(arg model)" />
+  </node>
+  
+  <node unless="$(arg service)"
+        pkg="openai_ros" type="openai_chat_rostopic.py" name="openai_chat_topic" output="screen">
+    <param name="key" value="$(arg key)" />
+    <param name="model" value="$(arg model)" />
+    <param name="prompt" value="$(arg prompt)" />
   </node>
   
 </launch>
