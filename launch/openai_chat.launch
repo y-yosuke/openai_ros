@@ -3,6 +3,7 @@
   <arg name="key" default="$(env OPENAI_API_KEY)" />
   <arg name="model" default="gpt-3.5-turbo" />
   <arg name="service" default="false" />
+  <arg name="opponent" default="false" />
   <arg name="prompt" default="You are a helpful assistant." />
   
   <node if="$(arg service)"
@@ -11,11 +12,22 @@
     <param name="model" value="$(arg model)" />
   </node>
   
-  <node unless="$(arg service)"
-        pkg="openai_ros" type="openai_chat_rostopic.py" name="openai_chat_topic" output="screen">
-    <param name="key" value="$(arg key)" />
-    <param name="model" value="$(arg model)" />
-    <param name="prompt" value="$(arg prompt)" />
-  </node>
+  <group unless="$(arg service)">
+    <node pkg="openai_ros" type="openai_chat_rostopic.py" name="openai_chat_topic" output="screen">
+      <param name="key" value="$(arg key)" />
+      <param name="model" value="$(arg model)" />
+      <param name="prompt" value="$(arg prompt)" />
+    </node>
+   
+    <group ns="opponent" if="$(arg opponent)">
+      <node pkg="openai_ros" type="openai_chat_rostopic.py" name="openai_chat_topic">
+        <param name="key" value="$(arg key)" />
+        <param name="model" value="$(arg model)" />
+        <param name="prompt" value="You are a good talker." />
+        <remap from="/opponent/request" to="/response" />
+        <remap from="/opponent/response" to="/request" />
+      </node>
+    </group>  
+  </group>
   
 </launch>
